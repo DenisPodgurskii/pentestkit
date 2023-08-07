@@ -2,7 +2,7 @@ import {
   WordArray,
 } from './core.js';
 
-const parseLoop = (base64Str, base64StrLength, reverseMap) => {
+export const parseLoop = (base64Str, base64StrLength, reverseMap) => {
   const words = [];
   let nBytes = 0;
   for (let i = 0; i < base64StrLength; i += 1) {

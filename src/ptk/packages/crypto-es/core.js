@@ -1,5 +1,56 @@
 /* eslint-disable no-use-before-define */
 
+const crypto =
+  (typeof globalThis != 'undefined' ? globalThis : void 0)?.crypto ||
+  (typeof global != 'undefined' ? global : void 0)?.crypto ||
+  (typeof window != 'undefined' ? window : void 0)?.crypto ||
+  (typeof self != 'undefined' ? self : void 0)?.crypto ||
+  (typeof frames != 'undefined' ? frames : void 0)?.[0]?.crypto;
+
+let randomWordArray;
+
+if (crypto) {
+  randomWordArray = (nBytes) => {
+    const words = [];
+
+    for (let i = 0, rcache; i < nBytes; i += 4) {
+      words.push(crypto.getRandomValues(new Uint32Array(1))[0]);
+    }
+
+    return new WordArray(words, nBytes);
+  }
+} else {
+  // Because there is no global crypto property in this context, cryptographically unsafe Math.random() is used.
+
+  randomWordArray = (nBytes) => {
+    const words = [];
+  
+    const r = (m_w) => {
+      let _m_w = m_w;
+      let _m_z = 0x3ade68b1;
+      const mask = 0xffffffff;
+  
+      return () => {
+        _m_z = (0x9069 * (_m_z & 0xFFFF) + (_m_z >> 0x10)) & mask;
+        _m_w = (0x4650 * (_m_w & 0xFFFF) + (_m_w >> 0x10)) & mask;
+        let result = ((_m_z << 0x10) + _m_w) & mask;
+        result /= 0x100000000;
+        result += 0.5;
+        return result * (Math.random() > 0.5 ? 1 : -1);
+      };
+    };
+  
+    for (let i = 0, rcache; i < nBytes; i += 4) {
+      const _r = r((rcache || Math.random()) * 0x100000000);
+  
+      rcache = _r() * 0x3ade67b7;
+      words.push((_r() * 0x100000000) | 0);
+    }
+  
+    return new WordArray(words, nBytes);
+  }
+}
+
 /**
  * Base class for inheritance.
  */
@@ -127,33 +178,7 @@ export class WordArray extends Base {
    *
    *     var wordArray = CryptoJS.lib.WordArray.random(16);
    */
-  static random(nBytes) {
-    const words = [];
-
-    const r = (m_w) => {
-      let _m_w = m_w;
-      let _m_z = 0x3ade68b1;
-      const mask = 0xffffffff;
-
-      return () => {
-        _m_z = (0x9069 * (_m_z & 0xFFFF) + (_m_z >> 0x10)) & mask;
-        _m_w = (0x4650 * (_m_w & 0xFFFF) + (_m_w >> 0x10)) & mask;
-        let result = ((_m_z << 0x10) + _m_w) & mask;
-        result /= 0x100000000;
-        result += 0.5;
-        return result * (Math.random() > 0.5 ? 1 : -1);
-      };
-    };
-
-    for (let i = 0, rcache; i < nBytes; i += 4) {
-      const _r = r((rcache || Math.random()) * 0x100000000);
-
-      rcache = _r() * 0x3ade67b7;
-      words.push((_r() * 0x100000000) | 0);
-    }
-
-    return new WordArray(words, nBytes);
-  }
+  static random = randomWordArray;
 
   /**
    * Converts this word array to a string.

@@ -27,6 +27,7 @@ import {
 
 import { Utf16, Utf16BE, Utf16LE } from './enc-utf16.js';
 import { Base64 } from './enc-base64.js';
+import { Base64url } from './enc-base64url.js';
 import { HMAC } from './hmac.js';
 import { MD5Algo, MD5, HmacMD5 } from './md5.js';
 import { SHA1Algo, SHA1, HmacSHA1 } from './sha1.js';
@@ -53,6 +54,7 @@ import {
   RC4DropAlgo,
   RC4Drop,
 } from './rc4.js';
+import { BlowfishAlgo, Blowfish } from './blowfish.js';
 import { CFB } from './mode-cfb.js';
 import { CTR } from './mode-ctr.js';
 import { CTRGladman } from './mode-ctr-gladman.js';
@@ -93,6 +95,7 @@ export default {
     Utf16BE,
     Utf16LE,
     Base64,
+    Base64url,
   },
 
   algo: {
@@ -116,6 +119,7 @@ export default {
     RabbitLegacy: RabbitLegacyAlgo,
     RC4: RC4Algo,
     RC4Drop: RC4DropAlgo,
+    Blowfish: BlowfishAlgo,
   },
 
   mode: {
@@ -172,4 +176,5 @@ export default {
   RabbitLegacy,
   RC4,
   RC4Drop,
+  Blowfish,
 };
